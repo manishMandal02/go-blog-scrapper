@@ -1,7 +1,9 @@
 package main
 
-import "github.com/manishmandal02/tech-blog-scrapper/internal/scrapper"
+import (
+	"github.com/manishmandal02/tech-blog-scrapper/internal/scrapper"
+)
 
 func main() {
-	scrapper.Start()
+	scrapper.StartAll()
 }

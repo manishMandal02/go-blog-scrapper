@@ -9,20 +9,13 @@ import (
 	"github.com/go-rod/rod/lib/proto"
 )
 
-func stripeBlog(limit int) ([]article, error) {
+func stripe(page *rod.Page, limit int, blog blog) ([]article, error) {
 	// strip blog url
-	blogURL := blogs[0].url
-
-	// page := rod.New().MustConnect().MustPage(blogURL)
+	blogURL := blog.url
 
 	responses := make(chan []article)
 
 	articles := []article{}
-
-	browser := createBrowser(false)
-	page := browser.MustConnect().MustPage()
-
-	defer browser.Close()
 
 	go page.EachEvent(func(ev *proto.PageLoadEventFired) (stop bool) {
 		fmt.Println("🌅 Page loaded")
@@ -33,7 +26,7 @@ func stripeBlog(limit int) ([]article, error) {
 			return true
 		}
 
-		articlesFound, err := getArticlesOnPage(page)
+		articlesFound, err := getStripeArticlesOnPage(page, blog)
 
 		if err != nil {
 			fmt.Println("error scrapping stripe blog. error:", err)
@@ -83,7 +76,7 @@ func stripeBlog(limit int) ([]article, error) {
 	return articles, nil
 }
 
-func getArticlesOnPage(page *rod.Page) ([]article, error) {
+func getStripeArticlesOnPage(page *rod.Page, blog blog) ([]article, error) {
 
 	articles := []article{}
 
@@ -120,7 +113,7 @@ func getArticlesOnPage(page *rod.Page) ([]article, error) {
 			article.thumbnail = *imageTag.MustAttribute("src")
 		} else {
 			// use stripe logo as thumbnail if no thumbnail image
-			article.thumbnail = blogs[0].logo
+			article.thumbnail = blog.logo
 		}
 
 		authorContainer := el.MustElement("div.BlogIndexPost__authorList").MustElements("figure")
@@ -134,14 +127,6 @@ func getArticlesOnPage(page *rod.Page) ([]article, error) {
 			article.tags = append(article.tags, tag)
 
 		}
-
-		// el.DOM.Find("figure ").Map(func(i int, s *goquery.Selection) string {
-		// 	// get tag (using author department as tag)
-		// 	tag = s.Find("figcaption > span").Text()
-
-		// 	// returns author name
-		// 	return s.Find("figcaption > a").Text()
-		// })
 
 		articles = append(articles, article)
 	}

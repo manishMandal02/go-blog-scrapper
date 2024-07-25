@@ -3,14 +3,19 @@ package scrapper
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
+	"github.com/go-rod/rod/lib/proto"
 	"github.com/manishmandal02/tech-blog-scrapper/internal/utils"
 )
 
 const MAX_LIMIT int = 100
+
+// max concurrent pages to be opened
+const MAX_PAGE_POOL_LIMIT int = 3
 
 type article struct {
 	title     string
@@ -52,37 +57,77 @@ var blogs = []blog{
 
 var browser *rod.Browser
 
-func StartAll() {
+var pool rod.Pool[rod.Page]
+
+func StartAll() []article {
+	defer utils.FuncExecutionTime()()
 
 	browser = getBrowser(false)
+
+	defer browser.MustClose()
+
+	// 	concurrently scrape pages
+	pool = rod.NewPagePool(3)
+
+	var wg sync.WaitGroup
+
+	allArticles := []article{}
 
 	for _, blog := range blogs {
 		switch {
 		case strings.Contains(blog.title, "Stripe"):
-			stripeArticles, err := StripeBlog(200)
-			if err != nil {
-				fmt.Println("Error scrapping stripe blog, error:", err)
-				return
-			}
-			fmt.Printf("Stripe blog %v\n", len(stripeArticles))
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				stripeArticles, err := StripeBlog(200)
+				if err != nil {
+					fmt.Println("Error scrapping stripe blog, error:", err)
+				} else {
+					fmt.Printf("Stripe blog %v\n", len(stripeArticles))
+					allArticles = append(allArticles, stripeArticles...)
+				}
+
+			}()
+
 		case strings.Contains(blog.title, "Netflix"):
-			netflixArticles, err := NetflixBlog(120)
-			if err != nil {
-				fmt.Println("Error scrapping netflix blog, error:", err)
-				return
-			}
-			fmt.Printf("Netflix blog %v\n", len(netflixArticles))
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				netflixArticles, err := NetflixBlog(120)
+				if err != nil {
+					fmt.Println("Error scrapping netflix blog, error:", err)
+
+				} else {
+
+					fmt.Printf("Netflix blog %v\n", len(netflixArticles))
+					allArticles = append(allArticles, netflixArticles...)
+
+				}
+
+			}()
+
 		case strings.Contains(blog.title, "Uber"):
-			uberArticles, err := UberBlog(120)
-			if err != nil {
-				fmt.Println("Error scrapping uber blog, error:", err)
-				return
-			}
-			fmt.Printf("Uber blog %v\n", len(uberArticles))
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				uberArticles, err := UberBlog(120)
+				if err != nil {
+					fmt.Println("Error scrapping uber blog, error:", err)
+				} else {
+					fmt.Printf("Uber blog %v\n", len(uberArticles))
+					allArticles = append(allArticles, uberArticles...)
+				}
+
+			}()
+
 		default:
 			fmt.Println("Unknown blog url.")
 		}
 	}
+
+	wg.Wait()
+
+	return allArticles
 }
 
 // scrape stripe blog
@@ -93,7 +138,9 @@ func StripeBlog(limit int) ([]article, error) {
 
 	limit = utils.SafeMaxLimit(limit, MAX_LIMIT)
 
-	page := browser.MustPage()
+	page := newBrowserPage()
+
+	defer page.Close()
 
 	return stripe(page, limit, blogs[0])
 }
@@ -106,7 +153,9 @@ func NetflixBlog(limit int) ([]article, error) {
 
 	limit = utils.SafeMaxLimit(limit, MAX_LIMIT)
 
-	page := browser.MustPage()
+	page := newBrowserPage()
+
+	defer page.Close()
 
 	return netflix(page, limit, blogs[1])
 }
@@ -116,10 +165,14 @@ func UberBlog(limit int) ([]article, error) {
 
 	limit = utils.SafeMaxLimit(limit, MAX_LIMIT)
 
-	page := browser.MustPage()
+	page := newBrowserPage()
+
+	defer page.Close()
 
 	return uber(page, limit, blogs[2])
 }
+
+// scrapper helpers
 
 func getBrowser(isHeadless bool) *rod.Browser {
 	// return existing browser if already created
@@ -136,4 +189,32 @@ func getBrowser(isHeadless bool) *rod.Browser {
 	browser.MustConnect()
 
 	return browser
+}
+
+// create pages
+// concurrently only when scrapping all blogs at once
+func newBrowserPage() *rod.Page {
+
+	if browser == nil {
+		browser = getBrowser(false)
+	}
+
+	// if poll is not initialized, then the program does not need concurrent pages
+	if pool == nil {
+		pool = rod.NewPagePool(MAX_PAGE_POOL_LIMIT)
+		return browser.MustPage()
+	}
+
+	createPage := func() (*rod.Page, error) {
+		return browser.Page(proto.TargetCreateTarget{})
+	}
+
+	page, err := pool.Get(createPage)
+
+	if err != nil {
+		fmt.Println("Error getting page from pool, error:", err)
+		return nil
+	}
+
+	return page
 }

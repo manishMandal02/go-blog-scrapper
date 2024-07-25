@@ -18,7 +18,7 @@ func stripe(page *rod.Page, limit int, blog blog) ([]article, error) {
 	articles := []article{}
 
 	go page.EachEvent(func(ev *proto.PageLoadEventFired) (stop bool) {
-		fmt.Println("🌅 Page loaded")
+		fmt.Println("🌅 stripe Page loaded")
 
 		if limit > 0 && len(articles) >= limit {
 			// stop if the desired num of articles scrapped

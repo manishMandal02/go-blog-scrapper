@@ -29,7 +29,6 @@ func netflix(page *rod.Page, limit int, blog blog) ([]article, error) {
 		articleEl := page.MustElements("div[data-post-id]")
 
 		totalArticlesOnPage = len(articleEl)
-		fmt.Println("🚨 totalArticlesOnPage:", totalArticlesOnPage)
 	}
 
 	// ref: skeleton loader selector:- "div.listItemPlaceholder.listItemPlaceholder--withSocialHeader"
@@ -71,14 +70,10 @@ func getNetflixArticlesOnPage(page *rod.Page, limit int, blog blog) ([]article, 
 		fmt.Println("❌ error navigating page.")
 	}
 
-	for i, el := range articleEl {
-
-		fmt.Printf("🔂 looping over i:%v, el:%+v", i, el)
+	for _, el := range articleEl {
 
 		// check if it's a featured article
 		hasHeadingContainer, _ := el.Element("div > a > h3")
-
-		fmt.Println("✅ hasHeadingContainer:", hasHeadingContainer)
 
 		article := article{}
 
@@ -90,7 +85,6 @@ func getNetflixArticlesOnPage(page *rod.Page, limit int, blog blog) ([]article, 
 		} else {
 			headingContainer = el.MustElement("div > a:has(h3)")
 		}
-		fmt.Println("✅ headingContainer:", headingContainer)
 
 		article.url = *headingContainer.MustAttribute("href")
 
@@ -102,8 +96,6 @@ func getNetflixArticlesOnPage(page *rod.Page, limit int, blog blog) ([]article, 
 		}
 		article.title = title.MustText()
 		article.desc = desc.MustText()
-
-		fmt.Printf("✅ article before date: %+v", article)
 
 		date := ""
 
@@ -120,23 +112,15 @@ func getNetflixArticlesOnPage(page *rod.Page, limit int, blog blog) ([]article, 
 			t = time.Now()
 		}
 
-		fmt.Println("✅ time:", t)
-
 		article.time = t
 
 		aTag, _ := el.Element("div > a[data-action='open-post']")
-
-		fmt.Println("✅ aTag:", aTag)
 
 		bgImageURL := ""
 
 		if aTag != nil {
 			bgImageURL = aTag.MustEval(`() => this.style.backgroundImage.slice(4, -1).replace(/"/g, "")`).Str()
 		}
-
-		fmt.Println("✅ bgImageURL:", bgImageURL)
-
-		fmt.Println("🌅 bg image url:", bgImageURL)
 
 		if bgImageURL != "" {
 			article.thumbnail = bgImageURL

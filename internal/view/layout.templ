@@ -10,6 +10,7 @@ templ header(title string) {
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src https://*; child-src 'none';"/>
+		// <meta http-equiv="Content-Security-Policy" content="font-src 'self' 'unsafe-inline' data:; img-src 'self' data:; style-src 'self' 'unsafe-inline' data:; script-src 'unsafe-eval' 'unsafe-inline' data:; default-src 'self' localhost:*"/>
 		if os.Getenv("env") == "production" {
 			<link rel="stylesheet" href="static/css/style.min.css"/>
 		} else {
@@ -22,14 +23,17 @@ templ header(title string) {
 templ nav(currentScrapper string) {
 	<nav class="bg-slate-800 flex flex-col items-center justify-center py-7">
 		<h1 class="max-w-fit mb-4 text-[24px] font-light tracking-wide text-slate-300">🕸️ Tech Blog Scrapper 🕸️</h1>
-		<div class="flex items-center justify-start max-w-fit gap-x-2">
+		<div
+			class="flex items-center justify-center gap-x-2"
+		>
 			for _, menu := range scrapperMenu {
 				if menu != currentScrapper {
 					<button
-						hx-get={ "/" + menu }
+						hx-get={ "/scrapper/" + menu }
 						hx-trigger="click"
 						hx-target="#app-layout"
 						class="text-gray-300 px-4 py-[2px] rounded-md capitalize"
+						hx-on:click="alert('Clicked!')"
 					>
 						{ menu }
 					</button>
@@ -47,10 +51,10 @@ templ footer() {
 	<footer class="bg-primary-600 p-4">by Manish Mandal</footer>
 }
 
-templ LayoutComponent() {
+templ LayoutComponent(path string) {
 	@header("Tech Blog Scrapper")
 	<body class="flex flex-col h-screen w-screen">
-		@nav("all")
+		@nav(path)
 		<main class="pt-10 flex items-start justify-center h-full" id="app-layout">
 			👆 Select a scrapper to see the results
 		</main>

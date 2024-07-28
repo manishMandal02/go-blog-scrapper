@@ -7,40 +7,29 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/manishmandal02/tech-blog-scrapper/internal/scrapper"
 	"github.com/manishmandal02/tech-blog-scrapper/internal/view"
 )
 
-type handler struct {
-}
-
-type serverHandler interface {
-	ServeHTTP(w http.ResponseWriter, r *http.Request)
-}
+var logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 func main() {
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-
 	mux := http.NewServeMux()
-
-	// loggerMiddleware
-	logger.Info("🚀 Server ready")
 
 	fileServer := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/*", http.StripPrefix("/static/", fileServer))
 
-	// withLogger := func(*http.ServeMux) *http.ServeMux {
-	// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// 		logger.Info(r.Method, r.URL.String())
-	// 		h.ServeHTTP(w, r)
-	// 	})
-	// }
-
 	mux.HandleFunc("/", getHomePageHandler)
 
-	mux.HandleFunc("/all", scrapeAllArticlesHandler)
+	mux.HandleFunc("/scrapper/{blog}", startScrapper)
+
+	// not found handler
+	// mux.HandleFunc(":", func(w http.ResponseWriter, r *http.Request) {
+	// 	http.NotFound(w, r)
+	// })
 
 	fmt.Println("🎉 Server running at :8080")
 
@@ -51,12 +40,33 @@ func main() {
 
 func getHomePageHandler(w http.ResponseWriter, r *http.Request) {
 
-	// articles := scrapper.StartAll()
+	if r.URL.Path != "/" {
+		return
+	}
 
-	view.LayoutComponent().Render(r.Context(), w)
+	logger.Info("home", r.Method, r.URL.String())
+
+	// articles := scrapper.StartAll()
+	path := strings.Split(r.URL.Path, "/")[1]
+
+	view.LayoutComponent(path).Render(r.Context(), w)
 }
 
-func scrapeAllArticlesHandler(w http.ResponseWriter, r *http.Request) {
+func startScrapper(w http.ResponseWriter, r *http.Request) {
+	// articles := scrapper.StartAll()
+	// logger.Info("scrapper", r.Method, r.URL.String())
+
+	blog := r.PathValue("blog")
+
+	fmt.Println("blog:", blog)
+	if blog == "" {
+		return
+	}
+
+	if blog != "all" && blog != "stripe" && blog != "uber" && blog != "netflix" {
+		return
+	}
+
 	articlesJSON, err := os.ReadFile("./internal/scrapper/articles.json")
 
 	if err != nil {
@@ -72,6 +82,7 @@ func scrapeAllArticlesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveArticlesToFile(articles []scrapper.Article) {
+
 	articlesJSON, err := json.Marshal(articles)
 
 	if err != nil {

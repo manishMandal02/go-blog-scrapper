@@ -17,41 +17,41 @@ const MAX_LIMIT int = 100
 // max concurrent pages to be opened
 const MAX_PAGE_POOL_LIMIT int = 3
 
-type article struct {
-	title     string
-	desc      string
-	time      time.Time
-	authors   []string
-	tags      []string
-	thumbnail string
-	url       string
+type Article struct {
+	Title     string
+	Desc      string
+	Time      time.Time
+	Authors   []string
+	Tags      []string
+	Thumbnail string
+	URL       string
 }
 
 type blog struct {
-	title    string
-	url      string
-	articles []article
-	logo     string
+	Title    string
+	URL      string
+	Articles []Article
+	Logo     string
 }
 
 var blogs = []blog{
 	{
-		title:    "Stripe Engineering",
-		url:      "https://stripe.com/blog/engineering",
-		logo:     "https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg",
-		articles: []article{},
+		Title:    "Stripe Engineering",
+		URL:      "https://stripe.com/blog/engineering",
+		Logo:     "https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg",
+		Articles: []Article{},
 	},
 	{
-		title:    "Netflix Blog",
-		url:      "https://netflixtechblog.com/",
-		logo:     "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Netflix_icon.svg/814px-Netflix_icon.svg.png",
-		articles: []article{},
+		Title:    "Netflix Blog",
+		URL:      "https://netflixtechblog.com/",
+		Logo:     "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Netflix_icon.svg/814px-Netflix_icon.svg.png",
+		Articles: []Article{},
 	},
 	{
-		title:    "Uber  Blog",
-		url:      "https://www.uber.com/en-IN/blog/engineering/",
-		logo:     "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Uber_logo_2018.svg/1600px-Uber_logo_2018.svg.png?20180914002846",
-		articles: []article{},
+		Title:    "Uber  Blog",
+		URL:      "https://www.uber.com/en-IN/blog/engineering/",
+		Logo:     "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Uber_logo_2018.svg/1600px-Uber_logo_2018.svg.png?20180914002846",
+		Articles: []Article{},
 	},
 }
 
@@ -59,7 +59,7 @@ var browser *rod.Browser
 
 var pool rod.Pool[rod.Page]
 
-func StartAll() []article {
+func StartAll() []Article {
 	defer utils.FuncExecutionTime()()
 
 	browser = getBrowser(false)
@@ -71,15 +71,15 @@ func StartAll() []article {
 
 	var wg sync.WaitGroup
 
-	allArticles := []article{}
+	allArticles := []Article{}
 
 	for _, blog := range blogs {
 		switch {
-		case strings.Contains(blog.title, "Stripe"):
+		case strings.Contains(blog.Title, "Stripe"):
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				stripeArticles, err := StripeBlog(200)
+				stripeArticles, err := StripeBlog(20)
 				if err != nil {
 					fmt.Println("Error scrapping stripe blog, error:", err)
 				} else {
@@ -89,11 +89,11 @@ func StartAll() []article {
 
 			}()
 
-		case strings.Contains(blog.title, "Netflix"):
+		case strings.Contains(blog.Title, "Netflix"):
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				netflixArticles, err := NetflixBlog(120)
+				netflixArticles, err := NetflixBlog(20)
 				if err != nil {
 					fmt.Println("Error scrapping netflix blog, error:", err)
 
@@ -106,11 +106,11 @@ func StartAll() []article {
 
 			}()
 
-		case strings.Contains(blog.title, "Uber"):
+		case strings.Contains(blog.Title, "Uber"):
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				uberArticles, err := UberBlog(120)
+				uberArticles, err := UberBlog(20)
 				if err != nil {
 					fmt.Println("Error scrapping uber blog, error:", err)
 				} else {
@@ -131,7 +131,7 @@ func StartAll() []article {
 }
 
 // scrape stripe blog
-func StripeBlog(limit int) ([]article, error) {
+func StripeBlog(limit int) ([]Article, error) {
 	if browser == nil {
 		browser = getBrowser(true)
 	}
@@ -146,7 +146,7 @@ func StripeBlog(limit int) ([]article, error) {
 }
 
 // scrape netflix blog
-func NetflixBlog(limit int) ([]article, error) {
+func NetflixBlog(limit int) ([]Article, error) {
 	if browser == nil {
 		browser = getBrowser(true)
 	}
@@ -160,7 +160,7 @@ func NetflixBlog(limit int) ([]article, error) {
 	return netflix(page, limit, blogs[1])
 }
 
-func UberBlog(limit int) ([]article, error) {
+func UberBlog(limit int) ([]Article, error) {
 	browser = getBrowser(false)
 
 	limit = utils.SafeMaxLimit(limit, MAX_LIMIT)
@@ -183,7 +183,7 @@ func getBrowser(isHeadless bool) *rod.Browser {
 	browser = rod.New()
 
 	if !isHeadless {
-		browser.ControlURL(launcher.New().Headless(false).MustLaunch())
+		browser.ControlURL(launcher.New().Headless(true).MustLaunch())
 	}
 
 	browser.MustConnect()

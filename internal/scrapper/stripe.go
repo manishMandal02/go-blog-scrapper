@@ -9,13 +9,13 @@ import (
 	"github.com/go-rod/rod/lib/proto"
 )
 
-func stripe(page *rod.Page, limit int, blog blog) ([]article, error) {
+func stripe(page *rod.Page, limit int, blog blog) ([]Article, error) {
 	// strip blog url
-	blogURL := blog.url
+	blogURL := blog.URL
 
-	responses := make(chan []article)
+	responses := make(chan []Article)
 
-	articles := []article{}
+	articles := []Article{}
 
 	go page.EachEvent(func(ev *proto.PageLoadEventFired) (stop bool) {
 		fmt.Println("🌅 stripe Page loaded")
@@ -76,9 +76,9 @@ func stripe(page *rod.Page, limit int, blog blog) ([]article, error) {
 	return articles, nil
 }
 
-func getStripeArticlesOnPage(page *rod.Page, blog blog) ([]article, error) {
+func getStripeArticlesOnPage(page *rod.Page, blog blog) ([]Article, error) {
 
-	articles := []article{}
+	articles := []Article{}
 
 	articleEl := page.MustElements("article")
 
@@ -94,10 +94,10 @@ func getStripeArticlesOnPage(page *rod.Page, blog blog) ([]article, error) {
 	}
 
 	for _, el := range articleEl {
-		article := article{}
-		article.title = el.MustElement(" h1 > a").MustText()
-		article.url = *el.MustElement(" h1 > a").MustAttribute("href")
-		article.desc = el.MustElement("div.BlogIndexPost__body > p").MustText()
+		article := Article{}
+		article.Title = el.MustElement(" h1 > a").MustText()
+		article.URL = *el.MustElement(" h1 > a").MustAttribute("href")
+		article.Desc = el.MustElement("div.BlogIndexPost__body > p").MustText()
 
 		date := *el.MustElement("time").MustAttribute("datetime")
 		t, err := time.Parse("2006-01-02T15:04-07:00", date)
@@ -105,15 +105,15 @@ func getStripeArticlesOnPage(page *rod.Page, blog blog) ([]article, error) {
 			fmt.Println("Error parsing time for stripe blog:", err)
 			t = time.Now()
 		}
-		article.time = t
+		article.Time = t
 
 		imageTag, _ := el.Element("picture > img")
 
 		if imageTag != nil {
-			article.thumbnail = *imageTag.MustAttribute("src")
+			article.Thumbnail = *imageTag.MustAttribute("src")
 		} else {
 			// use stripe logo as thumbnail if no thumbnail image
-			article.thumbnail = blog.logo
+			article.Thumbnail = blog.Logo
 		}
 
 		authorContainer := el.MustElement("div.BlogIndexPost__authorList").MustElements("figure")
@@ -121,10 +121,10 @@ func getStripeArticlesOnPage(page *rod.Page, blog blog) ([]article, error) {
 		for _, authorNode := range authorContainer {
 
 			author := authorNode.MustElement("figcaption > a").MustText()
-			article.authors = append(article.authors, author)
+			article.Authors = append(article.Authors, author)
 			// tags
 			tag := authorNode.MustElement("figcaption > span").MustText()
-			article.tags = append(article.tags, tag)
+			article.Tags = append(article.Tags, tag)
 
 		}
 

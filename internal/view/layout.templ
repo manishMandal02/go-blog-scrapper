@@ -1,0 +1,59 @@
+package view
+
+import "os"
+
+var scrapperMenu = []string{"all", "stripe", "netflix", "uber"}
+
+templ header(title string) {
+	<head>
+		<title>{ title }</title>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src https://*; child-src 'none';"/>
+		if os.Getenv("env") == "production" {
+			<link rel="stylesheet" href="static/css/style.min.css"/>
+		} else {
+			<link rel="stylesheet" href="static/css/style.css"/>
+		}
+		<script src="static/script/htmx.min.js"></script>
+	</head>
+}
+
+templ nav(currentScrapper string) {
+	<nav class="bg-slate-800 flex flex-col items-center justify-center py-7">
+		<h1 class="max-w-fit mb-4 text-[24px] font-light tracking-wide text-slate-300">🕸️ Tech Blog Scrapper 🕸️</h1>
+		<div class="flex items-center justify-start max-w-fit gap-x-2">
+			for _, menu := range scrapperMenu {
+				if menu != currentScrapper {
+					<button
+						hx-get={ "/" + menu }
+						hx-trigger="click"
+						hx-target="#app-layout"
+						class="text-gray-300 px-4 py-[2px] rounded-md capitalize"
+					>
+						{ menu }
+					</button>
+				} else {
+					<button class="text-gray-300 px-4 py-[2px] rounded-md capitalize border-2 border-gray-300">
+						{ menu }
+					</button>
+				}
+			}
+		</div>
+	</nav>
+}
+
+templ footer() {
+	<footer class="bg-primary-600 p-4">by Manish Mandal</footer>
+}
+
+templ LayoutComponent() {
+	@header("Tech Blog Scrapper")
+	<body class="flex flex-col h-screen w-screen">
+		@nav("all")
+		<main class="pt-10 flex items-start justify-center h-full" id="app-layout">
+			👆 Select a scrapper to see the results
+		</main>
+		@footer()
+	</body>
+}

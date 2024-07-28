@@ -1,0 +1,12 @@
+package view 
+
+import "github.com/manishmandal02/tech-blog-scrapper/internal/scrapper"
+
+templ ScrapperResult(articles []scrapper.Article) {
+	<div class="flex justify-center items-center">
+		// map result
+		for _, article := range articles {
+			@articleCard(article)
+		}
+	</div>
+}

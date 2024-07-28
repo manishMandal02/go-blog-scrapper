@@ -12,15 +12,16 @@ import (
 	"github.com/manishmandal02/tech-blog-scrapper/internal/utils"
 )
 
-func uber(page *rod.Page, limit int, blog blog) ([]article, error) {
+func uber(page *rod.Page, limit int, blog blog) ([]Article, error) {
 	// uber blog url
-	blogURL := blog.url
+	blogURL := blog.URL
 
-	responses := make(chan []article)
+	responses := make(chan []Article)
 
-	articles := []article{}
+	articles := []Article{}
 
 	go page.EachEvent(func(ev *proto.PageLoadEventFired) (stop bool) {
+		page.MustWaitDOMStable()
 		fmt.Println("🌅 uber Page loaded")
 
 		if limit > 0 && len(articles) >= limit {
@@ -44,7 +45,10 @@ func uber(page *rod.Page, limit int, blog blog) ([]article, error) {
 		for _, btn := range nextPageButtons {
 			nextBtn, _ := btn.Element("div > span")
 
-			fmt.Println("🚨 nextBtn text:", nextBtn.MustText() == "View more stories")
+			if nextBtn == nil {
+				continue
+			}
+
 			if nextBtn.MustText() != "Next" && nextBtn.MustText() != "View more stories" {
 				continue
 			}
@@ -55,15 +59,16 @@ func uber(page *rod.Page, limit int, blog blog) ([]article, error) {
 
 		responses <- articlesFound
 
-		if nextPageBtn == nil {
-			// stop
-			close(responses)
-			return true
+		if nextPageBtn != nil {
+			// go to next page
+			nextPageBtn.MustClick()
+			return false
 		}
 
-		// go to next page
-		nextPageBtn.MustClick()
-		return false
+		// stop
+		close(responses)
+		return true
+
 	})()
 
 	page.MustNavigate(blogURL)
@@ -80,9 +85,9 @@ func uber(page *rod.Page, limit int, blog blog) ([]article, error) {
 	return articles, nil
 }
 
-func getUberArticlesOnPage(page *rod.Page, blog blog) ([]article, error) {
+func getUberArticlesOnPage(page *rod.Page, blog blog) ([]Article, error) {
 
-	articles := []article{}
+	articles := []Article{}
 
 	articleEl := page.MustElements("a[data-baseweb='card']:has(img)")
 
@@ -98,11 +103,11 @@ func getUberArticlesOnPage(page *rod.Page, blog blog) ([]article, error) {
 	}
 
 	for _, el := range articleEl {
-		article := article{}
-		article.title = el.MustElement(" div > div > h5").MustText()
-		article.url = *el.MustAttribute("href")
+		article := Article{}
+		article.Title = el.MustElement(" div > div > h5").MustText()
+		article.URL = *el.MustAttribute("href")
 		// desc not found for uber blog
-		article.desc = ""
+		article.Desc = ""
 
 		date := el.MustElement(" div > div> p").MustText()
 
@@ -122,22 +127,27 @@ func getUberArticlesOnPage(page *rod.Page, blog blog) ([]article, error) {
 			fmt.Println("Error parsing time for uber blog:", err)
 			t = time.Now()
 		}
-		article.time = t
+		article.Time = t
 
 		imageTag, _ := el.Element("img")
 
 		if imageTag != nil {
-			article.thumbnail = *imageTag.MustAttribute("src")
+			article.Thumbnail = *imageTag.MustAttribute("src")
 		} else {
 			// use uber logo as thumbnail if no thumbnail image
-			article.thumbnail = blog.logo
+			article.Thumbnail = blog.Logo
 		}
 
-		article.authors = []string{}
+		article.Authors = []string{}
 
-		tag := el.MustElement("div > div > div").MustText()
+		tagContainer, _ := el.Element("div > div > div")
 
-		article.tags = strings.Split(tag, ",")
+		if tagContainer != nil {
+			article.Tags = strings.Split(tagContainer.MustText(), ",")
+		} else {
+			article.Tags = []string{}
+
+		}
 
 		articles = append(articles, article)
 	}

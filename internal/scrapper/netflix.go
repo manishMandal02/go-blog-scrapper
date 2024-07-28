@@ -8,11 +8,11 @@ import (
 	"github.com/go-rod/rod"
 )
 
-func netflix(page *rod.Page, limit int, blog blog) ([]article, error) {
+func netflix(page *rod.Page, limit int, blog blog) ([]Article, error) {
 	// netflix blog url
-	blogURL := blog.url
+	blogURL := blog.URL
 
-	articles := []article{}
+	articles := []Article{}
 
 	page.MustNavigate(blogURL)
 
@@ -49,9 +49,9 @@ func netflix(page *rod.Page, limit int, blog blog) ([]article, error) {
 	return articles, nil
 }
 
-func getNetflixArticlesOnPage(page *rod.Page, limit int, blog blog) ([]article, error) {
+func getNetflixArticlesOnPage(page *rod.Page, limit int, blog blog) ([]Article, error) {
 
-	articles := []article{}
+	articles := []Article{}
 
 	articleEl := page.MustElements("div[data-post-id]")
 
@@ -75,7 +75,7 @@ func getNetflixArticlesOnPage(page *rod.Page, limit int, blog blog) ([]article, 
 		// check if it's a featured article
 		hasHeadingContainer, _ := el.Element("div > a > h3")
 
-		article := article{}
+		article := Article{}
 
 		var headingContainer *rod.Element
 
@@ -86,7 +86,7 @@ func getNetflixArticlesOnPage(page *rod.Page, limit int, blog blog) ([]article, 
 			headingContainer = el.MustElement("div > a:has(h3)")
 		}
 
-		article.url = *headingContainer.MustAttribute("href")
+		article.URL = *headingContainer.MustAttribute("href")
 
 		title, _ := headingContainer.Element("h3 > div")
 		desc, _ := headingContainer.Element("h3 ~ div > div")
@@ -94,8 +94,8 @@ func getNetflixArticlesOnPage(page *rod.Page, limit int, blog blog) ([]article, 
 		if title == nil || desc == nil {
 			continue
 		}
-		article.title = title.MustText()
-		article.desc = desc.MustText()
+		article.Title = title.MustText()
+		article.Desc = desc.MustText()
 
 		date := ""
 
@@ -112,7 +112,7 @@ func getNetflixArticlesOnPage(page *rod.Page, limit int, blog blog) ([]article, 
 			t = time.Now()
 		}
 
-		article.time = t
+		article.Time = t
 
 		aTag, _ := el.Element("div > a[data-action='open-post']")
 
@@ -123,15 +123,15 @@ func getNetflixArticlesOnPage(page *rod.Page, limit int, blog blog) ([]article, 
 		}
 
 		if bgImageURL != "" {
-			article.thumbnail = bgImageURL
+			article.Thumbnail = bgImageURL
 		} else {
 			// use netflix logo as thumbnail if no thumbnail image
-			article.thumbnail = blog.logo
+			article.Thumbnail = blog.Logo
 		}
 
 		// netflix does not have authors and tags for articles
-		article.authors = []string{}
-		article.tags = []string{}
+		article.Authors = []string{}
+		article.Tags = []string{}
 
 		articles = append(articles, article)
 	}

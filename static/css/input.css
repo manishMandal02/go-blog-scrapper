@@ -5,3 +5,27 @@
 .active {
   border-color: #fafafa;
 }
+
+.text-ellipsis {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spinner {
+  display: none;
+}
+
+.htmx-request div.spinner {
+  display: flex;
+}
+
+/* .htmx-request.spinner {
+  display: flex;
+} */
+
+.htmx-request > div.scrapper-result div {
+  display: none;
+}

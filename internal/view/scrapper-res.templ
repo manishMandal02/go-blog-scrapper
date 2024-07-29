@@ -1,28 +1,64 @@
 package view 
 
-import "github.com/manishmandal02/tech-blog-scrapper/internal/scrapper"
+import (
+	"github.com/manishmandal02/tech-blog-scrapper/internal/scrapper"
+	"strings"
+)
+
+func getBlogIcon(url string) string {
+	switch {
+
+	case strings.Contains(url, scrapper.Blogs[0].URL):
+		return scrapper.Blogs[0].Logo
+	case strings.Contains(url, scrapper.Blogs[1].URL):
+		return scrapper.Blogs[1].Logo
+	case strings.Contains(url, scrapper.Blogs[2].URL):
+		return scrapper.Blogs[2].Logo
+	}
+
+	// fallback to globe icon
+	return "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Globe_icon.svg/840px-Globe_icon.svg.png?20180308223847"
+}
 
 templ ScrapperResult(articles []scrapper.Article) {
 	<div class="flex justify-center items-center w-full flex-wrap gap-x-4 gap-y-6">
 		// map result
 		for _, article := range articles {
-			<div class="overflow-hidden h-[400px] w-[22.5%] shadow-sm shadow-slate-300 rounded-md border border-slate-300">
+			<div class="overflow-hidden relative h-[400px] w-[23.5%] shadow-sm shadow-slate-300 rounded-md border border-slate-300">
 				<div
 					class="w-full h-[50%]"
 				>
-					<img src={ article.Thumbnail } alt="thumbnail" class="w-full h-full object-cover object-"/>
+					<img src={ article.Thumbnail } alt="thumbnail" class="w-full h-full object-cover "/>
 				</div>
-				<div class="px-2 py-1.5">
-					<p class="text-[16px] text-slate-700/80 leading-[20px]">{ article.Title }</p>
-					<div class="mt-[2px] text-[13px] font-light text-slate-700">
+				<div class="px-2 py-2 ">
+					<p class="text-[16px] text-slate-700 leading-[20px]">{ article.Title }</p>
+					<div class="mt-[4px] text-[13px] font-light text-slate-500 ">
 						if article.Desc != "" {
-							<p>{ article.Desc }</p>
+							<p class="text-ellipsis leading-[16px]">{ article.Desc }</p>
 						} else {
-							<p>No desc.</p>
+							<p>No description.</p>
 						}
 					</div>
 				</div>
-				// <a href={ article.URL } class="size-10 bg-slate-300 hover:bg-slate-400 text-slate-700/80 flex justify-center items-center">Go</a>
+				// tags
+				<div class="flex flex-wrap items-center justify-start gap-x-1 mt-[4px] px-2">
+					if len(article.Tags) > 0 {
+						for _, tag := range article.Tags {
+							<span class="bg-slate-200 rounded-lg px-3 py-[3px] text-[10px] font-light">{ tag }</span>
+						}
+					} else {
+						<span class="bg-slate-200 rounded-lg px-3 py-[3px] text-[10px] font-light">Netflix</span>
+					}
+				</div>
+				// blog icon
+				<div class="absolute bottom-2 right-[74px] size-[26px]">
+					<img src={ getBlogIcon(article.URL) } alt="blog icon" class="w-full h-full object-cover rounded-full border border-slate-700/80"/>
+				</div>
+				// time
+				<div class="absolute bottom-1 left-1.5 px-2 py-[2px] text-[11px]  text-slate-500 font-light text-center w-fit">
+					{ (article.Time).Format("Jan 2, 2006") }
+				</div>
+				<a href={ templ.URL(article.URL) } rel="noreferrer" target="_blank" class=" absolute bottom-2 right-2.5 w-fit text-[12px] font-medium pl-2.5 pr-2 py-[4px] bg-slate-200 rounded-md  text-slate-700/80 flex justify-center items-center hover:bg-slate-300/80 duration-300 transition-colors">Visit ↗</a>
 			</div>
 		}
 	</div>

@@ -105,7 +105,9 @@ func getUberArticlesOnPage(page *rod.Page, blog blog) ([]Article, error) {
 	for _, el := range articleEl {
 		article := Article{}
 		article.Title = el.MustElement(" div > div > h5").MustText()
-		article.URL = *el.MustAttribute("href")
+		path := *el.MustAttribute("href")
+		article.URL = blog.URL + path
+
 		// desc not found for uber blog
 		article.Desc = ""
 
@@ -137,8 +139,6 @@ func getUberArticlesOnPage(page *rod.Page, blog blog) ([]Article, error) {
 			// use uber logo as thumbnail if no thumbnail image
 			article.Thumbnail = blog.Logo
 		}
-
-		article.Authors = []string{}
 
 		tagContainer, _ := el.Element("div > div > div")
 

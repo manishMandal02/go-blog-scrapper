@@ -96,7 +96,9 @@ func getStripeArticlesOnPage(page *rod.Page, blog blog) ([]Article, error) {
 	for _, el := range articleEl {
 		article := Article{}
 		article.Title = el.MustElement(" h1 > a").MustText()
-		article.URL = *el.MustElement(" h1 > a").MustAttribute("href")
+		path := *el.MustElement(" h1 > a").MustAttribute("href")
+		article.URL = blog.URL + path
+
 		article.Desc = el.MustElement("div.BlogIndexPost__body > p").MustText()
 
 		date := *el.MustElement("time").MustAttribute("datetime")
@@ -118,12 +120,9 @@ func getStripeArticlesOnPage(page *rod.Page, blog blog) ([]Article, error) {
 
 		authorContainer := el.MustElement("div.BlogIndexPost__authorList").MustElements("figure")
 
-		for _, authorNode := range authorContainer {
-
-			author := authorNode.MustElement("figcaption > a").MustText()
-			article.Authors = append(article.Authors, author)
+		for _, tagNode := range authorContainer {
 			// tags
-			tag := authorNode.MustElement("figcaption > span").MustText()
+			tag := tagNode.MustElement("figcaption > span").MustText()
 			article.Tags = append(article.Tags, tag)
 
 		}

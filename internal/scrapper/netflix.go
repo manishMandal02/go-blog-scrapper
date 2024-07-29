@@ -31,8 +31,6 @@ func netflix(page *rod.Page, limit int, blog blog) ([]Article, error) {
 		totalArticlesOnPage = len(articleEl)
 	}
 
-	// ref: skeleton loader selector:- "div.listItemPlaceholder.listItemPlaceholder--withSocialHeader"
-
 	articlesFound, err := getNetflixArticlesOnPage(page, limit, blog)
 
 	if err != nil {
@@ -130,7 +128,6 @@ func getNetflixArticlesOnPage(page *rod.Page, limit int, blog blog) ([]Article, 
 		}
 
 		// netflix does not have authors and tags for articles
-		article.Authors = []string{}
 		article.Tags = []string{}
 
 		articles = append(articles, article)

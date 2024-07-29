@@ -21,7 +21,6 @@ type Article struct {
 	Title     string
 	Desc      string
 	Time      time.Time
-	Authors   []string
 	Tags      []string
 	Thumbnail string
 	URL       string
@@ -34,11 +33,11 @@ type blog struct {
 	Logo     string
 }
 
-var blogs = []blog{
+var Blogs = []blog{
 	{
 		Title:    "Stripe Engineering",
-		URL:      "https://stripe.com/blog/engineering",
-		Logo:     "https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg",
+		URL:      "https://stripe.com/blog/engineering/",
+		Logo:     "https://images.ctfassets.net/fzn2n1nzq965/HTTOloNPhisV9P4hlMPNA/cacf1bb88b9fc492dfad34378d844280/Stripe_icon_-_square.svg?q=80&w=1082",
 		Articles: []Article{},
 	},
 	{
@@ -50,7 +49,7 @@ var blogs = []blog{
 	{
 		Title:    "Uber  Blog",
 		URL:      "https://www.uber.com/en-IN/blog/engineering/",
-		Logo:     "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Uber_logo_2018.svg/1600px-Uber_logo_2018.svg.png?20180914002846",
+		Logo:     "https://cdn.icon-icons.com/icons2/2407/PNG/512/uber_icon_146079.png",
 		Articles: []Article{},
 	},
 }
@@ -59,10 +58,10 @@ var browser *rod.Browser
 
 var pool rod.Pool[rod.Page]
 
-func StartAll() []Article {
+func StartAll(isHeadless bool) []Article {
 	defer utils.FuncExecutionTime()()
 
-	browser = getBrowser(false)
+	browser = getBrowser(isHeadless)
 
 	defer browser.MustClose()
 
@@ -73,13 +72,13 @@ func StartAll() []Article {
 
 	allArticles := []Article{}
 
-	for _, blog := range blogs {
+	for _, blog := range Blogs {
 		switch {
 		case strings.Contains(blog.Title, "Stripe"):
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				stripeArticles, err := StripeBlog(20)
+				stripeArticles, err := StripeBlog(-1, isHeadless)
 				if err != nil {
 					fmt.Println("Error scrapping stripe blog, error:", err)
 				} else {
@@ -93,7 +92,7 @@ func StartAll() []Article {
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				netflixArticles, err := NetflixBlog(20)
+				netflixArticles, err := NetflixBlog(-1, isHeadless)
 				if err != nil {
 					fmt.Println("Error scrapping netflix blog, error:", err)
 
@@ -110,7 +109,7 @@ func StartAll() []Article {
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				uberArticles, err := UberBlog(20)
+				uberArticles, err := UberBlog(-1, isHeadless)
 				if err != nil {
 					fmt.Println("Error scrapping uber blog, error:", err)
 				} else {
@@ -131,9 +130,11 @@ func StartAll() []Article {
 }
 
 // scrape stripe blog
-func StripeBlog(limit int) ([]Article, error) {
+func StripeBlog(limit int, isHeadless bool) ([]Article, error) {
+	fmt.Println("Scraping stripe blog, browser:", browser)
+
 	if browser == nil {
-		browser = getBrowser(true)
+		browser = getBrowser(isHeadless)
 	}
 
 	limit = utils.SafeMaxLimit(limit, MAX_LIMIT)
@@ -142,13 +143,14 @@ func StripeBlog(limit int) ([]Article, error) {
 
 	defer page.Close()
 
-	return stripe(page, limit, blogs[0])
+	return stripe(page, limit, Blogs[0])
 }
 
 // scrape netflix blog
-func NetflixBlog(limit int) ([]Article, error) {
+func NetflixBlog(limit int, isHeadless bool) ([]Article, error) {
 	if browser == nil {
-		browser = getBrowser(true)
+		browser = getBrowser(isHeadless)
+
 	}
 
 	limit = utils.SafeMaxLimit(limit, MAX_LIMIT)
@@ -157,11 +159,13 @@ func NetflixBlog(limit int) ([]Article, error) {
 
 	defer page.Close()
 
-	return netflix(page, limit, blogs[1])
+	return netflix(page, limit, Blogs[1])
 }
 
-func UberBlog(limit int) ([]Article, error) {
-	browser = getBrowser(false)
+func UberBlog(limit int, isHeadless bool) ([]Article, error) {
+	if browser == nil {
+		browser = getBrowser(isHeadless)
+	}
 
 	limit = utils.SafeMaxLimit(limit, MAX_LIMIT)
 
@@ -169,11 +173,10 @@ func UberBlog(limit int) ([]Article, error) {
 
 	defer page.Close()
 
-	return uber(page, limit, blogs[2])
+	return uber(page, limit, Blogs[2])
 }
 
 // scrapper helpers
-
 func getBrowser(isHeadless bool) *rod.Browser {
 	// return existing browser if already created
 	if browser != nil {
@@ -183,7 +186,7 @@ func getBrowser(isHeadless bool) *rod.Browser {
 	browser = rod.New()
 
 	if !isHeadless {
-		browser.ControlURL(launcher.New().Headless(true).MustLaunch())
+		browser.ControlURL(launcher.New().Headless(isHeadless).MustLaunch())
 	}
 
 	browser.MustConnect()
@@ -192,7 +195,7 @@ func getBrowser(isHeadless bool) *rod.Browser {
 }
 
 // create pages
-// concurrently only when scrapping all blogs at once
+// concurrently only when scrapping all Blogs at once
 func newBrowserPage() *rod.Page {
 
 	if browser == nil {
@@ -201,9 +204,10 @@ func newBrowserPage() *rod.Page {
 
 	// if poll is not initialized, then the program does not need concurrent pages
 	if pool == nil {
-		pool = rod.NewPagePool(MAX_PAGE_POOL_LIMIT)
 		return browser.MustPage()
 	}
+
+	pool = rod.NewPagePool(MAX_PAGE_POOL_LIMIT)
 
 	createPage := func() (*rod.Page, error) {
 		return browser.Page(proto.TargetCreateTarget{})

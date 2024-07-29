@@ -3,10 +3,27 @@ package view
 import "github.com/manishmandal02/tech-blog-scrapper/internal/scrapper"
 
 templ ScrapperResult(articles []scrapper.Article) {
-	<div class="flex justify-center items-center">
+	<div class="flex justify-center items-center w-full flex-wrap gap-x-4 gap-y-6">
 		// map result
 		for _, article := range articles {
-			@articleCard(article)
+			<div class="overflow-hidden h-[400px] w-[22.5%] shadow-sm shadow-slate-300 rounded-md border border-slate-300">
+				<div
+					class="w-full h-[50%]"
+				>
+					<img src={ article.Thumbnail } alt="thumbnail" class="w-full h-full object-cover object-"/>
+				</div>
+				<div class="px-2 py-1.5">
+					<p class="text-[16px] text-slate-700/80 leading-[20px]">{ article.Title }</p>
+					<div class="mt-[2px] text-[13px] font-light text-slate-700">
+						if article.Desc != "" {
+							<p>{ article.Desc }</p>
+						} else {
+							<p>No desc.</p>
+						}
+					</div>
+				</div>
+				// <a href={ article.URL } class="size-10 bg-slate-300 hover:bg-slate-400 text-slate-700/80 flex justify-center items-center">Go</a>
+			</div>
 		}
 	</div>
 }

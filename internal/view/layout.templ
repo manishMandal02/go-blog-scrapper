@@ -30,21 +30,20 @@ templ nav(currentScrapper string) {
 		>
 			for _, menu := range scrapperMenu {
 				if menu != currentScrapper {
-					<input
-						type="submit"
-						value={ menu }
+					<button
 						hx-get={ "/scrapper/" + menu }
 						hx-trigger="click"
+						onclick="htmx.trigger('#request-button', 'htmx:abort')"
 						hx-target=".scrapper-result"
 						hx-indicator="#app-layout"
-						class="text-gray-300 px-4 py-[2px] rounded-md capitalize border-[1.5px] border-transparent transition-all duration-300 cursor-pointer"
-					/>
+						hx-sync="~:drop"
+						class="text-gray-300 px-4 py-[2px] rounded-md capitalize border-[1.5px] border-transparent transition-all duration-300"
+					>{ menu }</button>
 				} else {
-					<input
-						type="submit"
-						value={ menu }
-						class="text-gray-300  px-4 py-[2px] rounded-md capitalize  border-[1.5px] border-transparent transition-all duration-300 cursor-pointer"
-					/>
+					<button
+						hx-sync="button:drop"
+						class="text-gray-300  px-4 py-[2px] rounded-md capitalize  border-[1.5px] border-transparent transition-all duration-300"
+					>{ menu }</button>
 				}
 			}
 		</div>
@@ -66,7 +65,7 @@ templ LayoutComponent(path string) {
 	@header("Tech Blog Scrapper")
 	<body class="flex flex-col h-screen w-screen">
 		@nav(path)
-		<main class="pt-10 flex items-start justify-center h-full max-w-[95%] overflow-x-hidden px-6 py-4 htmx-indicator" id="app-layout">
+		<main class="pt-10 flex items-start justify-center h-full overflow-x-hidden px-6 py-4 htmx-indicator" id="app-layout">
 			// loading spinner
 			<div id="spinner" class="flex spinner items-center justify-center ml-4">
 				<svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>

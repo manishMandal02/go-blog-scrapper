@@ -827,10 +827,6 @@ select {
   width: 100vw;
 }
 
-.max-w-\[95\%\] {
-  max-width: 95%;
-}
-
 .max-w-fit {
   max-width: -moz-fit-content;
   max-width: fit-content;
@@ -844,10 +840,6 @@ select {
 
 .animate-spin {
   animation: spin 1s linear infinite;
-}
-
-.cursor-pointer {
-  cursor: pointer;
 }
 
 .select-none {

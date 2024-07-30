@@ -7,12 +7,11 @@ import (
 
 func getBlogIcon(url string) string {
 	switch {
-
-	case strings.Contains(url, scrapper.Blogs[0].URL):
+	case strings.Contains(url, "stripe.com"):
 		return scrapper.Blogs[0].Logo
 	case strings.Contains(url, scrapper.Blogs[1].URL):
 		return scrapper.Blogs[1].Logo
-	case strings.Contains(url, scrapper.Blogs[2].URL):
+	case strings.Contains(url, "uber.com"):
 		return scrapper.Blogs[2].Logo
 	}
 

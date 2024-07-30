@@ -106,7 +106,7 @@ func getUberArticlesOnPage(page *rod.Page, blog blog) ([]Article, error) {
 		article := Article{}
 		article.Title = el.MustElement(" div > div > h5").MustText()
 		path := *el.MustAttribute("href")
-		article.URL = blog.URL + path
+		article.URL = "https://www.uber.com" + path
 
 		// desc not found for uber blog
 		article.Desc = ""

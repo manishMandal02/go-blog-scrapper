@@ -97,7 +97,7 @@ func getStripeArticlesOnPage(page *rod.Page, blog blog) ([]Article, error) {
 		article := Article{}
 		article.Title = el.MustElement(" h1 > a").MustText()
 		path := *el.MustElement(" h1 > a").MustAttribute("href")
-		article.URL = blog.URL + path
+		article.URL = "https://stripe.com" + path
 
 		article.Desc = el.MustElement("div.BlogIndexPost__body > p").MustText()
 

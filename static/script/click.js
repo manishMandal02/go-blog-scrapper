@@ -5,8 +5,13 @@ const onMenuClick = ev => {
 
   console.log('🚀 ~ file: click.js:6 ~ onMenuClick ~ target:', target);
 
-  if (target.tagName === 'INPUT' && menuItems.includes(target.value.toLowerCase())) {
-    const prevActive = document.querySelector('input.active');
+  // const spinner = document.getElementById('spinner')
+  // if(spinner && spinner.style.display !== 'none') {
+  //   return
+  // }
+
+  if (target.tagName === 'BUTTON' && menuItems.includes(target.innerText.toLowerCase())) {
+    const prevActive = document.querySelector('button.active');
 
     if (prevActive) {
       prevActive.classList.remove('active');
@@ -18,14 +23,15 @@ const onMenuClick = ev => {
 
 (() => {
   setTimeout(() => {
-    const menuContainer = document.getElementById('scrapper-menu');
+    // const menuContainer = document.getElementById('scrapper-menu');
 
-    menuContainer.addEventListener('click', onMenuClick);
+    // menuContainer.addEventListener('click', onMenuClick);
 
-    //  htmx event listener
-    document.body.addEventListener('htmx:configRequest', function (evt) {
+    //  htmx (request start) event listener
+    document.body.addEventListener('htmx:configRequest', function (ev) {
       const isHeadless = document.getElementById('headless-scrapping')?.checked || false;
-      evt.detail.parameters['headless'] = isHeadless;
+      ev.detail.parameters['headless'] = isHeadless;
+      onMenuClick(ev);
     });
   }, 1500);
 })();

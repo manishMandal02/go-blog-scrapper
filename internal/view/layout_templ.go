@@ -90,51 +90,51 @@ func nav(currentScrapper string) templ.Component {
 		}
 		for _, menu := range scrapperMenu {
 			if menu != currentScrapper {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"submit\" value=\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var4 string
-				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(menu)
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs("/scrapper/" + menu)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/layout.templ`, Line: 35, Col: 18}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/layout.templ`, Line: 34, Col: 34}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-get=\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-trigger=\"click\" onclick=\"htmx.trigger(&#39;#request-button&#39;, &#39;htmx:abort&#39;)\" hx-target=\".scrapper-result\" hx-indicator=\"#app-layout\" hx-sync=\"~:drop\" class=\"text-gray-300 px-4 py-[2px] rounded-md capitalize border-[1.5px] border-transparent transition-all duration-300\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var5 string
-				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs("/scrapper/" + menu)
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(menu)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/layout.templ`, Line: 36, Col: 34}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/layout.templ`, Line: 41, Col: 12}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-trigger=\"click\" hx-target=\".scrapper-result\" hx-indicator=\"#app-layout\" class=\"text-gray-300 px-4 py-[2px] rounded-md capitalize border-[1.5px] border-transparent transition-all duration-300 cursor-pointer\">")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"submit\" value=\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button hx-sync=\"button:drop\" class=\"text-gray-300  px-4 py-[2px] rounded-md capitalize  border-[1.5px] border-transparent transition-all duration-300\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(menu)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/layout.templ`, Line: 45, Col: 18}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/layout.templ`, Line: 46, Col: 12}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"text-gray-300  px-4 py-[2px] rounded-md capitalize  border-[1.5px] border-transparent transition-all duration-300 cursor-pointer\">")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -204,7 +204,7 @@ func LayoutComponent(path string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main class=\"pt-10 flex items-start justify-center h-full max-w-[95%] overflow-x-hidden px-6 py-4 htmx-indicator\" id=\"app-layout\"><div id=\"spinner\" class=\"flex spinner items-center justify-center ml-4\"><svg class=\"animate-spin\" xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#1e293b\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg> <span class=\"ml-2 text-[18px] text-slate-700/80 \">Scrapping...</span></div><div class=\"scrapper-result\"><div class=\"ml-6 text-slate-700/80 text-[18px]\">👆 Select a blog to scrape</div></div></main>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main class=\"pt-10 flex items-start justify-center h-full overflow-x-hidden px-6 py-4 htmx-indicator\" id=\"app-layout\"><div id=\"spinner\" class=\"flex spinner items-center justify-center ml-4\"><svg class=\"animate-spin\" xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#1e293b\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg> <span class=\"ml-2 text-[18px] text-slate-700/80 \">Scrapping...</span></div><div class=\"scrapper-result\"><div class=\"ml-6 text-slate-700/80 text-[18px]\">👆 Select a blog to scrape</div></div></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

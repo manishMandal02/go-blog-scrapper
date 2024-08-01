@@ -1,0 +1,12 @@
+services:
+  server:
+    build:
+      context: .
+      target: final
+    develop:
+      watch:
+        - action: sync
+          path: ./internal
+          target: /app
+    ports:
+      - 8080:8080

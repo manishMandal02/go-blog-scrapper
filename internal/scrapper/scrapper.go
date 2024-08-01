@@ -2,6 +2,7 @@ package scrapper
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -133,6 +134,7 @@ func StartAll(isHeadless bool) []Article {
 func StripeBlog(limit int, isHeadless bool) ([]Article, error) {
 	fmt.Println("Scraping stripe blog, browser:", browser)
 
+	// TODO - also compare browser headless state
 	if browser == nil {
 		browser = getBrowser(isHeadless)
 	}
@@ -183,11 +185,20 @@ func getBrowser(isHeadless bool) *rod.Browser {
 		return browser
 	}
 
-	browser = rod.New()
-
-	if !isHeadless {
-		browser.ControlURL(launcher.New().Headless(isHeadless).MustLaunch())
+	// Set the Chrome path environment variable for Docker
+	chromePath := os.Getenv("CHROME_PATH")
+	if chromePath == "" {
+		chromePath = "/usr/bin/chromium-browser" // default path
 	}
+
+	// Initialize a new browser with the specified executable path
+	url := launcher.New().Bin(chromePath).Headless(isHeadless).MustLaunch()
+
+	browser = rod.New().ControlURL(url)
+
+	// if !isHeadless {
+	// 	browser.ControlURL(launcher.New().Headless(isHeadless).MustLaunch())
+	// }
 
 	browser.MustConnect()
 

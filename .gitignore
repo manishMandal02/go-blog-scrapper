@@ -8,6 +8,9 @@
 .env.local
 .idea
 
+temp
+bin
+
 # Test binary, built with `go test -c`
 *.test
 

@@ -103,7 +103,7 @@ func nav(currentScrapper string) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-trigger=\"click\" onclick=\"htmx.trigger(&#39;#request-button&#39;, &#39;htmx:abort&#39;)\" hx-target=\".scrapper-result\" hx-indicator=\"#app-layout\" hx-sync=\"~:drop\" class=\"text-gray-300 px-4 py-[2px] rounded-md capitalize border-[1.5px] border-transparent transition-all duration-300\">")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-trigger=\"click\" onclick=\"htmx.trigger(&#39;#request-button&#39;, &#39;htmx:abort&#39;)\" hx-target=\".scrapper-result\" hx-indicator=\"#app-layout\" hx-sync=\"button:drop\" class=\"text-gray-300 px-4 py-[2px] rounded-md capitalize border-[1.5px] border-transparent transition-all duration-300\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

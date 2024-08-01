@@ -36,7 +36,7 @@ templ nav(currentScrapper string) {
 						onclick="htmx.trigger('#request-button', 'htmx:abort')"
 						hx-target=".scrapper-result"
 						hx-indicator="#app-layout"
-						hx-sync="~:drop"
+						hx-sync="button:drop"
 						class="text-gray-300 px-4 py-[2px] rounded-md capitalize border-[1.5px] border-transparent transition-all duration-300"
 					>{ menu }</button>
 				} else {

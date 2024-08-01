@@ -23,5 +23,3 @@ func GetHomePageHandler(w http.ResponseWriter, r *http.Request) {
 
 	view.LayoutComponent(path).Render(r.Context(), w)
 }
-
-

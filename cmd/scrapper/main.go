@@ -9,9 +9,6 @@ import (
 	"github.com/manishmandal02/tech-blog-scrapper/internal/handlers"
 )
 
-
-
-
 func main() {
 
 	mux := http.NewServeMux()

@@ -22,7 +22,7 @@ dev:
 build:
 	make tailwind-build
 	make templ-generate
-	go build -ldflags "-X main.Environment=production" -o ./bin/scrapper ./cmd/scrapper/main.go
+	go build -o ./bin/scrapper ./cmd/scrapper/main.go
 
 .PHONY: vet
 vet:
@@ -34,4 +34,4 @@ staticcheck:
 
 .PHONY: test
 test:
-	  go test -race -v -timeout 30s ./...
+	  go test -race -v -timeout 30s ./..

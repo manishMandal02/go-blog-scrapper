@@ -11,8 +11,8 @@
 /static/css/style.css
 /static/css/style.min.css
 
-temp
-bin
+/tmp
+/bin
 
 # Test binary, built with `go test -c`
 *.test

@@ -28,6 +28,13 @@ ENV CHROME_PATH=/usr/bin/chromium-browser
 # Ensure the binary has executable permissions
 RUN chmod +x ./bin/scrapper
 
+# render.com passes the environment variable as an argument
+ARG ENVIRONMENT=docker
+
+ENV ENVIRONMENT=docker
+
+
+
 # run the server
 CMD ["./bin/scrapper"]                   
 

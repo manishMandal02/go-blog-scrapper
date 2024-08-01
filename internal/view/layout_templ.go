@@ -47,7 +47,7 @@ func header(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if os.Getenv("env") == "production" {
+		if os.Getenv("ENVIRONMENT") == "docker" {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<link rel=\"stylesheet\" href=\"static/css/style.min.css\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -140,33 +140,37 @@ func nav(currentScrapper string) templ.Component {
 				}
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><hr class=\"w-[20%] h-[1px] my-2 bg-slate-600 border-none\"><div class=\"flex items-center justify-center gap-x-2\"><input type=\"checkbox\" name=\"headless\" id=\"headless-scrapping\" class=\"appearance-none p-[6px] !outline-none !border-none duration-200 transition-colors hover:bg-emerald-400/70 checked:bg-emerald-400 focus-within:checked:bg-emerald-400/70 focus:scale-100 checked:hover:bg-emerald-400/70\" checked> <label for=\"headless-scrapping\" class=\"text-[14px] font-light text-gray-300/90 select-none\">Headless Browser</label></div></nav>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><hr class=\"w-[20%] h-[1px] my-2 bg-slate-600 border-none\"><div class=\"flex items-center justify-center gap-x-2\"><input type=\"checkbox\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		return templ_7745c5c3_Err
-	})
-}
-
-func footer() templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
+		if os.Getenv("ENVIRONMENT") == "docker" {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" disabled=\"true\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" disabled=\"false\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var7 == nil {
-			templ_7745c5c3_Var7 = templ.NopComponent
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" name=\"headless\" id=\"headless-scrapping\" class=\"appearance-none p-[6px] !outline-none !border-none duration-200 transition-colors hover:bg-emerald-400/70 checked:bg-emerald-400 focus-within:checked:bg-emerald-400/70 focus:scale-100 checked:hover:bg-emerald-400/70 disabled:cursor-not-allowed\" checked> <label for=\"headless-scrapping\" class=\"text-[14px] font-light text-gray-300/90 select-none\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
-		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<footer class=\"flex items-center justify-center bg-slate-800 py-2 text-slate-500 font-extralight hidden\">by Manish Mandal</footer>")
+		if os.Getenv("ENVIRONMENT") == "docker" {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("Headless Browser (cannot change in docker environment)")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("Headless Browser ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label></div></nav>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -187,9 +191,9 @@ func LayoutComponent(path string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var8 == nil {
-			templ_7745c5c3_Var8 = templ.NopComponent
+		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var7 == nil {
+			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = header("Tech Blog Scrapper").Render(ctx, templ_7745c5c3_Buffer)
@@ -204,15 +208,7 @@ func LayoutComponent(path string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main class=\"pt-10 flex items-start justify-center h-full overflow-x-hidden px-6 py-4 htmx-indicator\" id=\"app-layout\"><div id=\"spinner\" class=\"flex spinner items-center justify-center ml-4\"><svg class=\"animate-spin\" xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#1e293b\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg> <span class=\"ml-2 text-[18px] text-slate-700/80 \">Scrapping...</span></div><div class=\"scrapper-result\"><div class=\"ml-6 text-slate-700/80 text-[18px]\">👆 Select a blog to scrape</div></div></main>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = footer().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</body>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main class=\"pt-10 flex items-start justify-center h-full overflow-x-hidden px-6 py-4 htmx-indicator\" id=\"app-layout\"><div id=\"spinner\" class=\"flex spinner items-center justify-center ml-4\"><svg class=\"animate-spin\" xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#1e293b\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg> <span class=\"ml-2 text-[18px] text-slate-700/80 \">Scrapping...</span></div><div class=\"scrapper-result\"><div class=\"ml-6 text-slate-700/80 text-[18px]\">👆 Select a blog to scrape</div></div></main></body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

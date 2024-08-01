@@ -30,5 +30,8 @@
 **/values.dev.yaml
 temp
 bin
+bin
+static/css/styles.css
+static/css/styles.min.css
 LICENSE
 README.md

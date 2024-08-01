@@ -11,7 +11,7 @@ templ header(title string) {
 		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕸️</text></svg>"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src https://*; child-src 'none';"/>
-		if os.Getenv("env") == "production" {
+		if os.Getenv("ENVIRONMENT") == "docker" {
 			<link rel="stylesheet" href="static/css/style.min.css"/>
 		} else {
 			<link rel="stylesheet" href="static/css/style.css"/>
@@ -49,16 +49,27 @@ templ nav(currentScrapper string) {
 		</div>
 		<hr class="w-[20%] h-[1px] my-2 bg-slate-600 border-none"/>
 		<div class="flex items-center justify-center gap-x-2">
-			<input type="checkbox" name="headless" id="headless-scrapping" class="appearance-none p-[6px] !outline-none !border-none duration-200 transition-colors hover:bg-emerald-400/70 checked:bg-emerald-400 focus-within:checked:bg-emerald-400/70 focus:scale-100 checked:hover:bg-emerald-400/70" checked/>
+			<input
+				type="checkbox"
+				if os.Getenv("ENVIRONMENT") == "docker" {
+					disabled="true"
+				} else {
+					disabled="false"
+				}
+				name="headless"
+				id="headless-scrapping"
+				class="appearance-none p-[6px] !outline-none !border-none duration-200 transition-colors hover:bg-emerald-400/70 checked:bg-emerald-400 focus-within:checked:bg-emerald-400/70 focus:scale-100 checked:hover:bg-emerald-400/70 disabled:cursor-not-allowed"
+				checked
+			/>
 			<label for="headless-scrapping" class="text-[14px] font-light text-gray-300/90 select-none">
-				Headless Browser
+				if os.Getenv("ENVIRONMENT") == "docker" {
+					Headless Browser (cannot change in docker environment)
+				} else {
+					Headless Browser 
+				}
 			</label>
 		</div>
 	</nav>
-}
-
-templ footer() {
-	<footer class="flex items-center justify-center bg-slate-800 py-2 text-slate-500 font-extralight hidden">by Manish Mandal</footer>
 }
 
 templ LayoutComponent(path string) {
@@ -77,6 +88,5 @@ templ LayoutComponent(path string) {
 				</div>
 			</div>
 		</main>
-		@footer()
 	</body>
 }

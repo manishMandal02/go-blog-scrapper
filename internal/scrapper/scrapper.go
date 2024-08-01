@@ -185,20 +185,22 @@ func getBrowser(isHeadless bool) *rod.Browser {
 		return browser
 	}
 
-	// Set the Chrome path environment variable for Docker
-	chromePath := os.Getenv("CHROME_PATH")
-	if chromePath == "" {
-		chromePath = "/usr/bin/chromium-browser" // default path
+	isProd := os.Getenv("ENVIRONMENT") == "docker"
+
+	if isProd {
+		// app running in docker container needs browser location to start
+		browser = rod.New().ControlURL(os.Getenv("BROWSER_URL"))
+		// Set the Chrome path environment variable for Docker
+		chromePath := os.Getenv("CHROME_PATH")
+		if chromePath == "" {
+			chromePath = "/usr/bin/chromium-browser" // default path
+		}
+		// Initialize a new browser with the specified executable path
+		url := launcher.New().Bin(chromePath).Headless(isHeadless).MustLaunch()
+		browser = rod.New().ControlURL(url)
+	} else {
+		browser = rod.New().ControlURL(launcher.New().Headless(isHeadless).MustLaunch())
 	}
-
-	// Initialize a new browser with the specified executable path
-	url := launcher.New().Bin(chromePath).Headless(isHeadless).MustLaunch()
-
-	browser = rod.New().ControlURL(url)
-
-	// if !isHeadless {
-	// 	browser.ControlURL(launcher.New().Headless(isHeadless).MustLaunch())
-	// }
 
 	browser.MustConnect()
 

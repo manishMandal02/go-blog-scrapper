@@ -14,14 +14,16 @@
 - dev (air):
 
 ```shell
-  go mod tidy
-  make dev
+go mod tidy
+make templ-generate
+make tailwind-build
+make dev
 ```
 
 - dev (with docker):
 
 ```shell
-  docker compose up --build
+docker compose up --build
 ```
 
 ### Dependencies

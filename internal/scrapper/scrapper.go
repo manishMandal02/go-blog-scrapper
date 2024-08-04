@@ -132,9 +132,7 @@ func StartAll(isHeadless bool) []Article {
 
 // scrape stripe blog
 func StripeBlog(limit int, isHeadless bool) ([]Article, error) {
-	fmt.Println("Scraping stripe blog, browser:", browser)
 
-	// TODO - also compare browser headless state
 	if browser == nil {
 		browser = getBrowser(isHeadless)
 	}

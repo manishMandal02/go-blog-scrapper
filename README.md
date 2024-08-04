@@ -56,4 +56,4 @@ docker compose up --build
 
 <hr style="height:3px; border:none; background-color:#2e2e2e;" />
 
-> [manishmandal.me](https://manishmandal.me) • <span style="opacity:0.6;">GitHub </span> [@manishMandal02](https://github.com/manishMandal02) • <span style="opacity:0.6;">X</span> [@manishMandalJ](https://twitter.com/manishMandalJ)
+> [manishmandal.com](https://manishmandal.com) • <span style="opacity:0.6;">GitHub </span> [@manishMandal02](https://github.com/manishMandal02) • <span style="opacity:0.6;">X</span> [@manishMandalJ](https://twitter.com/manishMandalJ)

@@ -11,7 +11,7 @@ import (
 
 var logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
-func GetHomePageHandler(w http.ResponseWriter, r *http.Request) {
+func getIndexPage(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		return
 	}

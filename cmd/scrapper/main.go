@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/manishmandal02/tech-blog-scrapper/internal/handlers"
@@ -13,30 +11,19 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	fileServer := http.FileServer(http.Dir("./static"))
-	mux.Handle("/static/*", http.StripPrefix("/static/", fileServer))
+	routeHandlers := handlers.New("./static")
 
-	mux.HandleFunc("/", handlers.GetHomePageHandler)
+	mux.Handle("/static/*", routeHandlers.Static)
 
-	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+	mux.HandleFunc("/", routeHandlers.Home)
 
-		w.WriteHeader(http.StatusOK)
+	mux.HandleFunc("/health", routeHandlers.Health)
 
-		res := make(map[string]string)
-
-		res["status"] = "ok"
-
-		json.NewEncoder(w).Encode(res)
-
-		fmt.Fprintf(w, "{'status':'ok'}")
-	})
-
-	mux.HandleFunc("/scrapper/{blog}", handlers.StartScrapper)
+	mux.HandleFunc("/scrapper/{blog}", routeHandlers.Scrapper)
 
 	fmt.Println("🎉 Server running at :8080")
 
 	if err := http.ListenAndServe(":8080", mux); err != nil {
-		log.Printf("error listening: %v", err)
+		fmt.Printf("error listening: %v", err)
 	}
 }

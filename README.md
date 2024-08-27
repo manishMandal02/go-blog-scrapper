@@ -43,7 +43,7 @@ docker compose up --build
     └── Makefile         #contains all the scripts to run the app
     └── 📁cmd
         └── 📁scrapper
-            └── main.go  #main file
+            └── main.go  #app entrypoint
     └── 📁internal
         └── 📁handlers  # api handlers
         └── 📁scrapper  # scrapper logic

@@ -9,7 +9,7 @@ import (
 	"github.com/manishmandal02/tech-blog-scrapper/internal/view"
 )
 
-func StartScrapper(w http.ResponseWriter, r *http.Request) {
+func startScrapper(w http.ResponseWriter, r *http.Request) {
 	logger.Info("scrapper", r.Method, r.URL.String())
 
 	blog := r.PathValue("blog")
